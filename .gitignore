@@ -1,2 +1,5 @@
 # Node.js
 node_modules/
+
+# Ignore dotenv file
+.env
