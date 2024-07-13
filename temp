@@ -1,0 +1,9 @@
+Details for creating Event :
+→ event name
+→ location (include ground, seminar hall....)
+→ description (info about event)
+→ type(cultural, educational, sports ....) and subType
+→ date and Timings(for knowing if location is available or not)
+→ price(optional for paid events)
+→ department( eg  chemical, electrical,..)
+→ organiser contact details (name, department, email,...)
