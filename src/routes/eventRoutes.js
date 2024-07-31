@@ -2,13 +2,15 @@ const express = require('express')
 const router = express.Router()
 const eventController = require('../controllers/eventController')
 
-
 router.get('/', (req, res) => {
     res.send("hello")
     // res.sendFile(filePath + '/eventForm.html')
 })
 
-router.post('/', async (req, res) => {
+
+
+router.post('/events/addevent', async (req, res) => {
+    console.log("hi");
     try {
         const eventData = req.body
         const savedEvent = await eventController.createEvent(eventData);
@@ -73,6 +75,18 @@ router.get('/test', async (req, res) =>{
     catch(error){
         console.error('Error fetching events:', error);
         res.status(500).json({ err: 'Error fetching events' })
+    }
+})
+
+router.get('/events/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const event = await eventController.getEventById(id);
+        res.json(event)
+    }
+    catch (error) {
+        console.error('Error fetching event:', error);
+        res.status(500).json({ err: 'Error fetching event' })
     }
 })
 
