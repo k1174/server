@@ -80,12 +80,34 @@ async function getEventById(id) {
     }
 }
 
+async function updateEvent(id, eventData) {
+    try {
+        const updatedEvent = await Event.findByIdAndUpdate(id, eventData, { new: true });
+        return updatedEvent;
+    }
+    catch (error) {
+        console.error('Error updating event:', error);
+        throw error;
+    }
+}
 
+async function deleteEvent(id) {
+    try {
+        const deletedEvent = await Event.findByIdAndDelete(id);
+        return deletedEvent;
+    }
+    catch (error) {
+        console.error('Error deleting event:', error);
+        throw error;
+    }
+}
 
 module.exports = {
     createEvent,
     getAllEvents,
     sortEvents,
     getEvents,
-    getEventById
+    getEventById,
+    updateEvent,
+    deleteEvent,
 };

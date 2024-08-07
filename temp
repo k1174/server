@@ -7,3 +7,6 @@ Details for creating Event :
 → price(optional for paid events)
 → department( eg  chemical, electrical,..)
 → organiser contact details (name, department, email,...)
+
+mongdb migration 
+[youtube: Import JSON FILES to Mongo ATLAS | EXPORT file from Local Mongo DB](https://youtu.be/fkGafwD-b1s?si=_42IqTCV0ADkXs3K)
