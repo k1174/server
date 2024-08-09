@@ -33,7 +33,8 @@ async function createEvent(eventData) {
 
 async function getAllEvents(status) {
     try {
-        const events = await Event.find({ status: status });
+        const now = new Date();
+        const events = await Event.find({ status: status, date: { $gte: now } }).sort({ date: 'asc' });
         return events;
     }
     catch (error) {

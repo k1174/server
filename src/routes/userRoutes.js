@@ -11,7 +11,9 @@ router.post('/register', async (req, res) => {
         const userData = req.body
         const savedUser = await userController.createUser(userData);
         console.log('User saved successfully:', savedUser);
-        res.status(201).json({ message: 'User registered successfully' });
+        res.status(201).json({ message: 'User registered successfully',
+            savedUser
+         });
     }
     catch (err) {
         console.error('Error saving user:', err);
