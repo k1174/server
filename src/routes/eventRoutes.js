@@ -7,6 +7,17 @@ router.get('/', (req, res) => {
     // res.sendFile(filePath + '/eventForm.html')
 })
 
+// router to get past events
+router.get('/events/past', async (req, res) => {
+    try {
+        const events = await eventController.getPastEvents();
+        res.json(events)
+    }
+    catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({ err: 'Error fetching events' })
+    }
+})
 
 
 router.post('/events/addevent', async (req, res) => {
