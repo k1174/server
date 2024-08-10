@@ -103,6 +103,19 @@ async function deleteEvent(id) {
     }
 }
 
+// Function to get past events
+async function getPastEvents() {
+    try {
+        const now = new Date();
+        const events = await Event.find({ status: 'approved', date: { $lt: now } }).sort({ date: 'desc' });
+        return events;
+    }
+    catch (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createEvent,
     getAllEvents,
@@ -111,4 +124,5 @@ module.exports = {
     getEventById,
     updateEvent,
     deleteEvent,
+    getPastEvents,
 };
