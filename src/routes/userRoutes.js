@@ -56,6 +56,20 @@ router.get('/profile', async (req, res) => {
     }
 })
 
+//Route to get user registration events
+router.get('/registrations', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const events = await userController.getRegisteredEvents(decoded.id);
+        res.json(events);
+    }
+    catch (err) {
+        console.error('Error fetching registered events:', err);
+        res.status(500).json({error: err.message});
+    }
+})
+
 // Route to update the profile of the logged-in user
 
 
