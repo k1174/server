@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const Event = require('../models/schemaDB');
 const Registration = require('../models/registrationModel');
 const User = require('../models/userSchema');
+const Feedback = require('../models/feedback');
 
 router.get('/test', async (req, res) => {
     res.status(201).json({ message: 'User registered successfully' });
@@ -126,6 +127,21 @@ router.get('/getUsersCount/:eventId', async (req, res) => {
     }
     catch (err) {
         console.error('Error getting count:', err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+//route to get feedback from user
+router.post('/feedback', async (req, res) => {
+    try {
+        const { userId, eventId, feedback, rating } = req.body;
+
+        const newFeedback = new Feedback({ userId, eventId, feedback, rating });
+        const savedFeedback = await newFeedback.save();
+        res.status(201).json({ message: 'Feedback submitted successfully', savedFeedback });
+    }
+    catch (err) {
+        console.error('Error submitting feedback:', err);
         res.status(500).json({ error: err.message });
     }
 })
