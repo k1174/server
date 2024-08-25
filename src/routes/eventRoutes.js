@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const eventController = require('../controllers/eventController')
+const {matchSorter} = require('match-sorter')
 
 router.get('/', (req, res) => {
     res.send("hello")
@@ -25,8 +26,8 @@ router.post('/events/addevent', async (req, res) => {
     try {
         const eventData = req.body
         const savedEvent = await eventController.createEvent(eventData);
-        console.log('Event saved successfully:', savedEvent);
-        res.redirect('/events')
+        // console.log('Event saved successfully:', savedEvent);
+        res.status(200).send('Event saved successfully');
     }
     catch (error) {
         console.error('Error saving event:', error);
@@ -63,9 +64,17 @@ router.delete('/events/:id', async (req, res) => {
 router.get('/events', async (req, res) => {
 
     try {
-        const events = await eventController.getAllEvents("approved");
+        let events = await eventController.getAllEvents("approved");
         // res.json(events)
         
+        // get query
+        const query = req.query;
+        console.log("get(events)",query.q)
+        if (query.q) {
+            const filteredEvents = matchSorter(events, query.q);
+            events = filteredEvents;
+        }
+
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(events, null, 2));
     }
@@ -90,7 +99,16 @@ router.get('/events/dates', async (req, res) => {
 
 router.get('/admin', async (req, res) => {
     try{
-        const events = await eventController.getAllEvents("pending");
+        
+        let events = await eventController.getAllEvents("pending");
+        //filter events
+        const query = req.query;
+        console.log("get(events)",query.q)
+        if (query.q) {
+            const filteredEvents = matchSorter(events, query.q);
+            events = filteredEvents;
+        }
+
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(events, null, 2));
 
@@ -141,6 +159,5 @@ router.get('/admin/:id', async (req, res) => {
         res.status(500).json({ err: 'Error fetching event' })
     }
 })
-
 
 module.exports = router;
