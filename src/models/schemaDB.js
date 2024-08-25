@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 
 // Define schema for Event
 const eventSchema = new mongoose.Schema({
+    userId: { type: String, required: true },
     name: { type: String, required: true },
     location: { type: String, required: true },
     description: { type: String, required: true },
