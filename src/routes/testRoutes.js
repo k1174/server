@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const {sendMail} = require('../services/mail')
-const {test} = require('../services/test')
+const {test, getMails} = require('../services/test')
 
 //route to test send mail
 router.get('/sendmail', (req, res) => {
     const mailOptions = {
         from: process.env.EMAIL,
-        to: 'nijomi9102@biscoine.com',
+        to: process.env.TESTEMAILS,
         subject: 'Test Email',
         text: 'This is a test email with second'
     };
@@ -21,6 +21,15 @@ router.get('/sendmail', (req, res) => {
     });
 });
 
+//router to test get mails
+router.get('/getmails', async (req, res) => {
+    //send data
+    const mails = await getMails();
+
+    res.send(mails);
+})
+
+//route to test test function
 router.get('/test', (req, res) => {
     test();
     res.send('Test function executed');

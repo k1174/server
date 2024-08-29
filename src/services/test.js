@@ -73,4 +73,17 @@ const test = async () => {
     }
 }
 
-module.exports = { test }
+const getMails = async () => {
+    const events = await Event.find({ status: 'approved',"date": {"$gte": new Date()}});
+    const data = []
+    for (const event of events) {
+        // const eventId = mongoose.Types.ObjectId(event._id);
+        const usersToNotify = (await Registration.find({ eventId: event._id }, { userId: 1, _id: 0 })).map(reg => reg.userId);
+        const usersEmails = (await User.find({ _id: { $in: usersToNotify } }, { email: 1, _id: 0 })).map(user => user.email);
+
+        // data.push({event.name:usersEmails})
+        data.push({[event.name]:usersEmails})
+    }
+    return data;
+}
+module.exports = { test, getMails };
