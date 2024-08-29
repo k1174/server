@@ -8,6 +8,8 @@ const eventRoutes = require('./src/routes/eventRoutes.js')
 const apiRoutes = require('./src/routes/apiRoutes.js')
 const testRoutes = require('./src/routes/testRoutes.js')
 
+// Import and run the cron jobs
+require('./src/services/schedule.js');
 
 const app = express()
 
