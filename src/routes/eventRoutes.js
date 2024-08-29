@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const eventController = require('../controllers/eventController')
-const {matchSorter} = require('match-sorter')
+const { matchSorter } = require('match-sorter')
 
 router.get('/', (req, res) => {
     res.send("hello")
@@ -36,26 +36,26 @@ router.post('/events/addevent', async (req, res) => {
 })
 
 router.put('/events/:id', async (req, res) => {
-    try{
+    try {
         const id = req.params.id;
         console.log("id", id, " Approved");
         const eventData = req.body;
         const updatedEvent = await eventController.updateEvent(id, eventData);
         res.json(updatedEvent)
     }
-    catch(error){
+    catch (error) {
         console.error('Error updating event:', error);
         res.status(500).json({ err: 'Error updating event' })
     }
 })
 
 router.delete('/events/:id', async (req, res) => {
-    try{
+    try {
         const id = req.params.id;
         const deletedEvent = await eventController.deleteEvent(id);
         res.json(deletedEvent)
     }
-    catch(error){
+    catch (error) {
         console.error('Error deleting event:', error);
         res.status(500).json({ err: 'Error deleting event' })
     }
@@ -66,10 +66,10 @@ router.get('/events', async (req, res) => {
     try {
         let events = await eventController.getAllEvents("approved");
         // res.json(events)
-        
+
         // get query
         const query = req.query;
-        console.log("get(events)",query.q)
+        // console.log("get(events)",query.q)
         if (query.q) {
             const filteredEvents = matchSorter(events, query.q);
             events = filteredEvents;
@@ -85,25 +85,25 @@ router.get('/events', async (req, res) => {
 })
 
 router.get('/events/dates', async (req, res) => {
-    try{
+    try {
         const events = await eventController.sortEvents();
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(events, null, 2));
 
     }
-    catch(error){
+    catch (error) {
         console.error('Error fetching events:', error);
         res.status(500).json({ err: 'Error fetching events' })
     }
 })
 
 router.get('/admin', async (req, res) => {
-    try{
-        
+    try {
+
         let events = await eventController.getAllEvents("pending");
         //filter events
         const query = req.query;
-        console.log("get(events)",query.q)
+        // console.log("get(events)",query.q)
         if (query.q) {
             const filteredEvents = matchSorter(events, query.q);
             events = filteredEvents;
@@ -113,7 +113,7 @@ router.get('/admin', async (req, res) => {
         res.send(JSON.stringify(events, null, 2));
 
     }
-    catch(error){
+    catch (error) {
         console.error('Error fetching events:', error);
         res.status(500).json({ err: 'Error fetching events' })
     }
@@ -121,14 +121,14 @@ router.get('/admin', async (req, res) => {
 
 
 
-router.get('/test', async (req, res) =>{
-    try{
+router.get('/events/test', async (req, res) => {
+    try {
         const events = await eventController.getEvents();
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(events, null, 2));
 
     }
-    catch(error){
+    catch (error) {
         console.error('Error fetching events:', error);
         res.status(500).json({ err: 'Error fetching events' })
     }
