@@ -1,10 +1,10 @@
-import cron from 'node-cron';
-import nodemailer from 'nodemailer';
-import Event from '../models/event.js';
-import User from '../models/user.js';
-import Registration from '../models/registration.js';
-import { parseTime } from '../utils.js';
-import dotenv from 'dotenv';
+const cron = require('node-cron');
+const nodemailer = require('nodemailer');
+const Event = require('../models/schemaDB.js');
+const User = require('../models/userSchema.js');
+const Registration = require('../models/registrationModel.js');
+const dotenv = require('dotenv');
+const { sendMail } = require('./mail.js')
 dotenv.config();
 
 // Configure mail transporter
@@ -16,16 +16,27 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Helper function to parse time string
+const parseTime = (timeStr) => {
+    const [time, period] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+
+    if (period === 'PM' && hours < 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+
+    return { hours, minutes };
+};
+
 // Daily cron job to send event reminder
 cron.schedule('0 0 * * *', async () => {
     console.log('Running a daily cron job to send event reminders');
-    
-    try {
-        const events = await Event.find({ status: 'approved' });
-        const users = await User.find({ role: 'user' });
 
+    try {
+        //get the upcoming event; which are approved
+        const events = await Event.find({ status: 'approved', "date": { "$gte": new Date() } });
+        //travse each
         for (const event of events) {
-            const registration = await Registration.find({ eventId: event._id });
+
             const eventDate = new Date(event.date);
             const time = parseTime(event.time);
             eventDate.setHours(time.hours);
@@ -40,8 +51,13 @@ cron.schedule('0 0 * * *', async () => {
                 continue;
             }
 
-            const usersToNotify = registration.map(reg => reg.userId);
-            const usersEmails = users.filter(user => usersToNotify.includes(user._id)).map(user => user.email);
+            // const registration = await Registration.find({ eventId: ObjectId(event._id) });
+            // const usersToNotify = registration.map(reg => reg.userId);
+
+            //get userId from registraion having eventId and transfom into array of userid
+            const usersToNotify = (await Registration.find({ eventId: event._id }, { userId: 1, _id: 0 })).map(reg => reg.userId);
+
+            const usersEmails = (await User.find({ _id: { $in: usersToNotify } }, { email: 1, _id: 0 })).map(user => user.email);
 
             const mailOptions = {
                 from: process.env.EMAIL,
@@ -61,13 +77,12 @@ cron.schedule('0 0 * * *', async () => {
 // Cron job to send event notification 1 hour before the event
 cron.schedule('0 * * * *', async () => {
     console.log('Running a cron job to send event notifications 1 hour before the event');
-    
+
     try {
-        const events = await Event.find({ status: 'approved' });
-        const users = await User.find({ role: 'user' });
+        const events = await Event.find({ status: 'approved', "date": { "$gte": new Date() } });
 
         for (const event of events) {
-            const registration = await Registration.find({ eventId: event._id });
+
             const eventDate = new Date(event.date);
             const time = parseTime(event.time);
             eventDate.setHours(time.hours);
@@ -81,8 +96,9 @@ cron.schedule('0 * * * *', async () => {
                 continue;
             }
 
-            const usersToNotify = registration.map(reg => reg.userId);
-            const usersEmails = users.filter(user => usersToNotify.includes(user._id)).map(user => user.email);
+
+            const usersToNotify = (await Registration.find({ eventId: event._id }, { userId: 1, _id: 0 })).map(reg => reg.userId);
+            const usersEmails = (await User.find({ _id: { $in: usersToNotify } }, { email: 1, _id: 0 })).map(user => user.email);
 
             const mailOptions = {
                 from: process.env.EMAIL,
@@ -98,3 +114,20 @@ cron.schedule('0 * * * *', async () => {
         console.error('Error in hourly cron job:', error);
     }
 });
+
+cron.schedule('1,30 * * * *', async () => {
+    console.log('running every minute 1, and 30');
+});
+
+// cron.schedule('* * * * *', () => {
+//     try {
+
+//         console.log('Cron job is running every minute');
+//     } catch (error) {
+//         console.error('Error in cron job:', error);
+//     }
+// });
+
+// cron.schedule('*/10 * * * * *',  ()=>{
+//     console.log('running every 10 second');
+// })
