@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
 const port = process.env.PORT || 4000;
 
@@ -11,11 +12,13 @@ const testRoutes = require('./src/routes/testRoutes.js')
 // Import and run the cron jobs
 require('./src/services/schedule.js');
 
+dotenv.config();
+
 const app = express()
 
-const uri = "mongodb+srv://ubutuvaio:kamlesh8391@cluster0.xdie8uj.mongodb.net/eventDB?retryWrites=true&w=majority&appName=Cluster0"
 
-mongoose.connect(uri)
+
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('DB Connected!'))
     .catch((err) => console.error('DB connection error: ', err))
 
