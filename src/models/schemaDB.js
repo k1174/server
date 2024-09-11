@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 // Define schema for Event
 const eventSchema = new mongoose.Schema({
-    userId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
     location: { type: String, required: true },
     description: { type: String, required: true },
@@ -14,7 +14,8 @@ const eventSchema = new mongoose.Schema({
     organiserName: { type: String, required: true },
     organiserEmail: { type: String, required: true },
     organiserDepartment: { type: String, required: true },
-    status: { type: String, default: "pending" }
+    status: { type: String, default: "pending" },
+    createdAt: { type: Date, default: Date.now },
 });
 
 

@@ -148,6 +148,19 @@ router.get('/events/:id', async (req, res) => {
     }
 })
 
+//route to get events of userId
+router.get('/events/user/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const events = await eventController.getUserCreatedEvents(id);
+        res.json(events)
+    }
+    catch (error) {
+        console.error('Error fetching event:', error);
+        res.status(500).json({ err: 'Error fetching event' })
+    }
+})  
+
 router.get('/admin/:id', async (req, res) => {
     const id = req.params.id;
     try {

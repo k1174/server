@@ -20,13 +20,13 @@ async function createEvent(eventData) {
 
     try {
         const newEvent = new Event(eventData);//eventData was empty thats why on .save() it was throwing error
-        console.log(eventData)
+        // console.log(eventData)
         const savedEvent = await newEvent.save();
-        console.log('Event saved successfully:', savedEvent);
+        console.log('Event saved successfully:', savedEvent.name);
         return savedEvent
     }
     catch (error) {
-        console.error('Error saving event:');
+        // console.error('Error saving event:');
         throw error;
     }
 }
@@ -64,6 +64,22 @@ async function getEvents() {
     } catch (error) {
         console.error('Error fetching events:', error);
         throw new Error('Error fetching events');
+    }
+}
+
+// Function to get list of types from events
+async function getTypes(){
+    try{
+        // db.events.aggregate([{$group: {_id: "$type"}},{$project:{type:"$_id",_id:0}}])
+        const types = await Event.aggregate([
+            { $group: { _id: "$type" } },
+            { $project: { type: "$_id", _id: 0 } }
+        ]);
+        return types;
+    }
+    catch(error){
+        console.error('Error fetching types:', error);
+        throw new Error('Error fetching types');
     }
 }
 
@@ -107,7 +123,19 @@ async function deleteEvent(id) {
 async function getPastEvents() {
     try {
         const now = new Date();
-        const events = await Event.find({ status: 'approved', date: { $lt: now } }).sort({ date: 'desc' });
+        const events = await Event.find({ status: 'approved', date: { $lte: now } }).sort({ date: 'desc' });
+        return events;
+    }
+    catch (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+    }
+}
+
+//get event created by userId
+async function getUserCreatedEvents(userId) {
+    try {
+        const events = await Event.find({ userId: userId });
         return events;
     }
     catch (error) {
@@ -125,4 +153,6 @@ module.exports = {
     updateEvent,
     deleteEvent,
     getPastEvents,
+    getUserCreatedEvents,
+    getTypes
 };

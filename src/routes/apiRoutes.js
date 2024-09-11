@@ -146,4 +146,45 @@ router.post('/feedback', async (req, res) => {
     }
 })
 
+//router to get report
+router.get('/getReport/:eventId', async (req, res) => {
+    const { eventId } = req.params;
+    try {
+        const feedbacks = await Feedback.find({ eventId });
+        // if (!feedbacks.length) {
+        //     return res.status(404).json({ message: 'No feedback found for this event' });
+        // }
+        
+        // const registrations = await Registration.find({ eventId }).populate('userId');
+        // const users = registrations.map(reg => reg.userId.email);
+        
+        // const avgRating = feedbacks.reduce((acc, curr) => acc + curr.rating, 0) / feedbacks.length;
+        // const feedbackCount = feedbacks.length;
+        const feedbackContent = feedbacks.map(feedback => {
+            return `feedback: ${feedback.feedback}, rating: ${feedback.rating}`
+        });
+        res.status(200).json( feedbackContent);
+    }
+    catch (err) {
+        console.error('Error getting report:', err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+//router to getFeedbacks
+router.get('/getFeedbacks/:eventId', async (req, res) => {
+    const { eventId } = req.params;
+    try {
+        const feedbacks = await Feedback.find({ eventId });
+        if (!feedbacks.length) {
+            return res.status(404).json({ message: 'No feedback found for this event' });
+        }
+        res.status(200).json(feedbacks);
+    }
+    catch (err) {
+        console.error('Error getting feedbacks:', err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
 module.exports = router;
