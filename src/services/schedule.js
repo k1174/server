@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 const { sendMail } = require('./mail.js')
 dotenv.config();
 
+const https = require('https');
+
 // Configure mail transporter
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -117,6 +119,14 @@ cron.schedule('0 * * * *', async () => {
 
 cron.schedule('1,30 * * * *', async () => {
     console.log('running every minute 1, and 30');
+    url='https://server-56ae.onrender.com/'
+    https.get(url, (res) => {
+        console.log('statusCode:', res.statusCode);
+        console.log('headers:', res.headers);
+    }).on('error', (e) => {
+        console.error('error:', e);
+    });
+    console.log('sent request to:', url);
 });
 
 // cron.schedule('* * * * *', () => {
