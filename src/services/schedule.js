@@ -119,14 +119,7 @@ cron.schedule('0 * * * *', async () => {
 
 cron.schedule('1,30 * * * *', async () => {
     console.log('running every minute 1, and 30');
-    url='https://server-56ae.onrender.com/'
-    https.get(url, (res) => {
-        console.log('statusCode:', res.statusCode);
-        console.log('headers:', res.headers);
-    }).on('error', (e) => {
-        console.error('error:', e);
-    });
-    console.log('sent request to:', url);
+    ping()
 });
 
 // cron.schedule('* * * * *', () => {
@@ -141,3 +134,19 @@ cron.schedule('1,30 * * * *', async () => {
 // cron.schedule('*/10 * * * * *',  ()=>{
 //     console.log('running every 10 second');
 // })
+
+function ping(){
+    url='https://server-56ae.onrender.com/'
+    https.get(url, (res) => {
+        res.on('data',(chunk)=>{
+            console.log('data:', chunk);
+        })
+        res.on('end',()=>{
+            console.log(new Date(), 'end');
+        })
+
+    }).on('error', (e) => {
+        console.error('error:', e);
+    });
+    console.log('sent request to:', url);
+}
