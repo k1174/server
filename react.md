@@ -1,5 +1,3 @@
-Great, thanks for the details! Based on your responses, here's a more detailed approach to building your event creation web app for a college environment:
-
 ### Project Requirements and Approach:
 
 #### 1. User Roles
