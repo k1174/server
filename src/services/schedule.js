@@ -139,14 +139,14 @@ function ping(){
     url='https://server-56ae.onrender.com/'
     https.get(url, (res) => {
         res.on('data',(chunk)=>{
-            console.log('data:', chunk);
+            // console.log('data:', chunk);
         })
         res.on('end',()=>{
-            console.log(new Date(), 'end');
+            // console.log(new Date(), 'end');
         })
 
     }).on('error', (e) => {
         console.error('error:', e);
     });
-    console.log('sent request to:', url);
+    console.log('ping:', url);
 }
