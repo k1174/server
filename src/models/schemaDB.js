@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+// const Img = require('./ImgModel')
 
 // Define schema for Event
 const eventSchema = new mongoose.Schema({
@@ -17,6 +18,9 @@ const eventSchema = new mongoose.Schema({
     organiserDepartment: { type: String, required: true },
     status: { type: String, default: "pending" },
     createdAt: { type: Date, default: Date.now },
+    // image: { type: mongoose.Schema.Types.ObjectId, ref: 'Img' } // Reference to the Img document
+    // images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Img' }] // Array of references to Img documents
+    images: [{ type: String }]
 });
 
 

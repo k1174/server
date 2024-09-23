@@ -2,6 +2,34 @@ const express = require('express')
 const router = express.Router()
 const eventController = require('../controllers/eventController')
 const { matchSorter } = require('match-sorter')
+const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+
+const multer = require('multer')
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, uniqueSuffix+'-'+file.originalname)
+    }
+})
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
+const upload = multer({ storage: storage })
+
+//logs the route
+router.use((req, res, next) => {
+    console.log(`Event route accessed: ${req.method} ${req.originalUrl}`);
+    next();
+});
 
 router.get('/', (req, res) => {
     res.send("hello")
@@ -21,12 +49,32 @@ router.get('/events/past', async (req, res) => {
 })
 
 
-router.post('/events/addevent', async (req, res) => {
-    console.log("hi");
+router.post('/events/addevent', upload.array('images'), async (req, res) => {
     try {
-        const eventData = req.body
+        const images = []
+        // Process each uploaded image
+        for (const file of req.files) {
+            const result = await cloudinary.uploader.upload(file.path, {
+                folder: 'images'
+            })
+            fs.unlink(file.path, (err) => {
+                if (err) {
+                    console.error(err)
+                    return
+                }
+            })
+            images.push(result.secure_url)
+        }
+
+        // Create the event and associate it with the image url
+        const eventData = {
+            ...req.body,
+            images: images // Reference the array of image url
+        };
+
+        // const eventData = req.body
         const savedEvent = await eventController.createEvent(eventData);
-        // console.log('Event saved successfully:', savedEvent);
+        console.log('Event saved successfully:', savedEvent);
         res.status(200).send('Event saved successfully');
     }
     catch (error) {
@@ -159,7 +207,7 @@ router.get('/events/user/:id', async (req, res) => {
         console.error('Error fetching event:', error);
         res.status(500).json({ err: 'Error fetching event' })
     }
-})  
+})
 
 router.get('/admin/:id', async (req, res) => {
     const id = req.params.id;
