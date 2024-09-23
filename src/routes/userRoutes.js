@@ -4,6 +4,13 @@ const userController = require('../controllers/userController')
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
+//logs the route
+// router.use((req, res, next) => {
+//     console.log(`User route accessed: ${req.method} ${req.originalUrl}`);
+//     next();
+// });
+
+
 //Route to register a new user
 router.post('/register', async (req, res) => {
     console.log("register")

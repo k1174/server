@@ -7,6 +7,12 @@ const Registration = require('../models/registrationModel');
 const User = require('../models/userSchema');
 const Feedback = require('../models/feedback');
 
+//logs the route
+router.use((req, res, next) => {
+    console.log(`API route accessed: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 router.get('/test', async (req, res) => {
     res.status(201).json({ message: 'User registered successfully' });
 })
