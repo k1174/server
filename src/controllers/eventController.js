@@ -34,7 +34,11 @@ async function createEvent(eventData) {
 async function getAllEvents(status) {
     try {
         const now = new Date();
-        const events = await Event.find({ status: status, date: { $gte: now } }).sort({ date: 'asc' });
+        now.setHours(0, 0, 0, 0);
+        const events = await Event.find({ status: status, date: { $gte: now } })
+            .select('-images') // Exclude the images field
+            .sort({ date: 'asc' });
+        console.log(events.length)
         return events;
     }
     catch (error) {
@@ -68,8 +72,8 @@ async function getEvents() {
 }
 
 // Function to get list of types from events
-async function getTypes(){
-    try{
+async function getTypes() {
+    try {
         // db.events.aggregate([{$group: {_id: "$type"}},{$project:{type:"$_id",_id:0}}])
         const types = await Event.aggregate([
             { $group: { _id: "$type" } },
@@ -77,14 +81,14 @@ async function getTypes(){
         ]);
         return types;
     }
-    catch(error){
+    catch (error) {
         console.error('Error fetching types:', error);
         throw new Error('Error fetching types');
     }
 }
 
 async function getEventById(id) {
-    
+
     try {
         const eventData = await Event.findById(id);
         if (!eventData) {
