@@ -7,11 +7,6 @@ const Registration = require('../models/registrationModel');
 const User = require('../models/userSchema');
 const Feedback = require('../models/feedback');
 
-//logs the route
-router.use((req, res, next) => {
-    console.log(`API route accessed: ${req.method} ${req.originalUrl}`);
-    next();
-});
 
 router.get('/test', async (req, res) => {
     res.status(201).json({ message: 'User registered successfully' });
@@ -27,8 +22,7 @@ router.get('/getApprovedEvents', async (req, res) => {
 router.post('/registerEvent', async (req, res) => {
 
     try {
-        const { userId, eventId } = req.body;
-
+        const { userId, eventId, additionalDetails } = req.body;
         // Check if a registration already exists for this user and event
         const existingRegistration = await Registration.findOne({ userId, eventId });
 
@@ -36,7 +30,7 @@ router.post('/registerEvent', async (req, res) => {
             return res.status(400).json({ message: 'User is already registered for this event' });
         }
         
-        const registration = new Registration({ userId, eventId });
+        const registration = new Registration({ userId, eventId, additionalDetails });
         const savedRegistration = await registration.save();
         res.status(201).json({ message: 'User registered for event', savedRegistration });
 
@@ -133,6 +127,18 @@ router.get('/getUsersCount/:eventId', async (req, res) => {
     }
     catch (err) {
         console.error('Error getting count:', err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+router.get('/getRegistrations/:eventId', async (req, res) =>{
+    const {eventId} = req.params;
+    try{
+        const registraions = await Registration.find({eventId}).select('additionalDetails');
+        res.status(200).json(registraions)
+    }
+    catch(err){
+        console.error('Error fetching registraions', err);
         res.status(500).json({ error: err.message });
     }
 })
