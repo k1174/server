@@ -4,18 +4,18 @@ const userController = require('../controllers/userController')
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
-//logs the route
-// router.use((req, res, next) => {
-//     console.log(`User route accessed: ${req.method} ${req.originalUrl}`);
-//     next();
-// });
-
 
 //Route to register a new user
 router.post('/register', async (req, res) => {
     console.log("register")
     try {
         const userData = req.body
+        //find if email id already exists
+        const user = await userController.getUserByEmail(userData.email);
+        if (user) {
+            return res.status(400).json({ error: 'User with this email already exists' });
+        }
+
         const savedUser = await userController.createUser(userData);
         console.log('User saved successfully:', savedUser);
         res.status(201).json({ message: 'User registered successfully',
