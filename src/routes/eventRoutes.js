@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, uniqueSuffix+'-'+file.originalname)
+        cb(null, uniqueSuffix + '-' + file.originalname)
     }
 })
 
@@ -26,10 +26,10 @@ cloudinary.config({
 const upload = multer({ storage: storage })
 
 //logs the route
-router.use((req, res, next) => {
-    console.log(`Event route accessed: ${req.method} ${req.originalUrl}`);
-    next();
-});
+// router.use((req, res, next) => {
+//     console.log(`Event route accessed: ${req.method} ${req.originalUrl}`);
+//     next();
+// });
 
 router.get('/', (req, res) => {
     res.send("hello")
@@ -51,6 +51,7 @@ router.get('/events/past', async (req, res) => {
 
 router.post('/events/addevent', upload.array('images'), async (req, res) => {
     try {
+        // console.log(req.body)
         const images = []
         // Process each uploaded image
         for (const file of req.files) {
@@ -66,11 +67,24 @@ router.post('/events/addevent', upload.array('images'), async (req, res) => {
             images.push(result.secure_url)
         }
 
+        const formArray = []
+        const data = req.body
+        for (const key in data) {
+            if (key.startsWith('form-')) {
+                formArray.push({
+                    field: key.split('-')[2],
+                    value: data[key]
+                });
+            }
+        }
+
         // Create the event and associate it with the image url
         const eventData = {
             ...req.body,
-            images: images // Reference the array of image url
+            images: images, // Reference the array of image url
+            formData: formArray // Add the dynamically created formData array
         };
+        console.log(eventData)
 
         // const eventData = req.body
         const savedEvent = await eventController.createEvent(eventData);
