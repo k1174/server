@@ -47,6 +47,18 @@ async function getAllEvents(status) {
     }
 }
 
+//route to get all pending events
+async function getPendingEvents() {
+    try {
+        const events = await Event.find({ status: "pending" });
+        return events;
+    }
+    catch (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+    }
+}
+
 async function sortEvents() {
     try {
         const events = await Event.find({ status: "approved" }).sort({ date: 'asc' });
@@ -148,6 +160,24 @@ async function getUserCreatedEvents(userId) {
     }
 }
 
+//add image to the event
+async function addImages(id, imageLinks) {
+    if (!Array.isArray(imageLinks)) {
+        return res.status(400).json({ message: 'imageLinks must be an array' });
+    }
+    try {
+        const updatedEvent = await Event.findByIdAndUpdate(
+            id,
+            { $push: { images: { $each: imageLinks } } }, // Use $push with $each to add multiple items
+            { new: true } // Return the updated document
+        );
+        return updatedEvent;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 module.exports = {
     createEvent,
     getAllEvents,
@@ -158,5 +188,7 @@ module.exports = {
     deleteEvent,
     getPastEvents,
     getUserCreatedEvents,
-    getTypes
+    getTypes,
+    getPendingEvents,
+    addImages
 };
