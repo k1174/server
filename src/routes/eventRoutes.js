@@ -97,12 +97,45 @@ router.post('/events/addevent', upload.array('images'), async (req, res) => {
     }
 })
 
+//router to add images to the existing event
+router.post('/events/addImages/:id', upload.array('images'), async (req, res) => {
+    try {
+        const id = req.params.id;
+        const images = []
+        // Process each uploaded image
+        for (const file of req.files) {
+            const result = await cloudinary.uploader.upload(file.path, {
+                folder: 'images'
+            })
+            fs.unlink(file.path, (err) => {
+                if (err) {
+                    console.error(err)
+                    return
+                }
+            })
+            images.push(result.secure_url)
+        }
+
+        const updatedEvent = await eventController.addImages(id, images);
+        if (!updatedEvent) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        console.log('Images added successfully');
+        res.json(updatedEvent)
+    }
+    catch (error) {
+        console.error('Error adding images:', error);
+        res.status(500).json({ err: 'Error adding images' })
+    }
+})
+
 router.put('/events/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        console.log("id", id, " Approved");
         const eventData = req.body;
         const updatedEvent = await eventController.updateEvent(id, eventData);
+        console.log('Event updated successfully');
         res.json(updatedEvent)
     }
     catch (error) {
@@ -162,7 +195,7 @@ router.get('/events/dates', async (req, res) => {
 router.get('/admin', async (req, res) => {
     try {
 
-        let events = await eventController.getAllEvents("pending");
+        let events = await eventController.getPendingEvents();
         //filter events
         const query = req.query;
         // console.log("get(events)",query.q)
