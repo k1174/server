@@ -49,6 +49,27 @@ router.get('/events/past', async (req, res) => {
 })
 
 
+//router to get events events between two dates
+// GET /events/range?startDate=2024-01-01&endDate=2024-12-31
+router.get('/events/range', async (req,res)=>{
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+
+    if (!startDate || !endDate) {
+        return res.status(400).json({ error: 'Please provide both startDate and endDate' });
+    }
+
+    try{
+        const events = await eventController.getEventsByDateRange(startDate, endDate);
+        res.json(events);
+    }
+    catch(err){
+        console.error('Error fetching events:', error);
+        res.status(500).json({ err: 'Error fetching events' });
+    }
+})
+
+
 router.post('/events/addevent', upload.array('images'), async (req, res) => {
     try {
         // console.log(req.body)
@@ -267,5 +288,7 @@ router.get('/admin/:id', async (req, res) => {
         res.status(500).json({ err: 'Error fetching event' })
     }
 })
+
+
 
 module.exports = router;

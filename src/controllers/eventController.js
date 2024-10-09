@@ -178,6 +178,17 @@ async function addImages(id, imageLinks) {
     }
 }
 
+//get evnnts by date range
+async function getEventsByDateRange(startDate, endDate) {
+    try {
+        const events = await Event.find({ date: { $gte: startDate, $lte: endDate } });
+        return events;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     createEvent,
     getAllEvents,
@@ -190,5 +201,6 @@ module.exports = {
     getUserCreatedEvents,
     getTypes,
     getPendingEvents,
-    addImages
+    addImages,
+    getEventsByDateRange
 };
