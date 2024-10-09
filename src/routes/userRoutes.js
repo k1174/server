@@ -18,13 +18,14 @@ router.post('/register', async (req, res) => {
 
         const savedUser = await userController.createUser(userData);
         console.log('User saved successfully:', savedUser);
-        res.status(201).json({ message: 'User registered successfully',
+        res.status(201).json({
+            message: 'User registered successfully',
             savedUser
-         });
+        });
     }
     catch (err) {
         console.error('Error saving user:', err);
-        res.status(500).json({error: err.message});
+        res.status(500).json({ error: err.message });
     }
 })
 
@@ -45,7 +46,7 @@ router.post('/login', async (req, res) => {
     }
     catch (err) {
         console.error('Error logging in user:', err);
-        res.status(500).json({error: err.message});
+        res.status(500).json({ error: err.message });
     }
 })
 
@@ -55,11 +56,11 @@ router.get('/profile', async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await userController.getUserById(decoded.id);
-        res.json(user);  
+        res.json(user);
     }
     catch (err) {
         console.error('Error fetching user profile:', err);
-        res.status(500).json({error: err.message});
+        res.status(500).json({ error: err.message });
     }
 })
 
@@ -73,12 +74,28 @@ router.get('/registrations', async (req, res) => {
     }
     catch (err) {
         console.error('Error fetching registered events:', err);
-        res.status(500).json({error: err.message});
+        res.status(500).json({ error: err.message });
     }
 })
 
 // Route to update the profile of the logged-in user
 
+
+//route to check if event is created by user gets true or false
+router.post('/checkEvent', async (req, res) => {
+    try{
+        const {eventId, token} = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const event = await userController.checkEvent(eventId, userId);
+        res.json(event);    
+
+    }
+    catch(error){
+        console.error('Error fetching event:', error);
+        res.status(500).json({ error: error.message });
+    }
+})
 
 //test
 router.get('/test', async (req, res) => {
