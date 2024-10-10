@@ -39,7 +39,15 @@ router.get('/', (req, res) => {
 // router to get past events
 router.get('/events/past', async (req, res) => {
     try {
-        const events = await eventController.getPastEvents();
+        let events = await eventController.getPastEvents();
+        // get query
+        const query = req.query;
+        // console.log("get(events)",query.q)
+        if (query.q) {
+            const filteredEvents = matchSorter(events, query.q);
+            events = filteredEvents;
+        }
+
         res.json(events)
     }
     catch (error) {
