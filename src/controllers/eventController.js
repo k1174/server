@@ -181,7 +181,7 @@ async function addImages(id, imageLinks) {
 //get evnnts by date range
 async function getEventsByDateRange(startDate, endDate) {
     try {
-        const events = await Event.find({ date: { $gte: startDate, $lte: endDate } });
+        const events = await Event.find({ date: { $gte: startDate, $lte: endDate } }).sort({ date: 'asc' });
         return events;
     }
     catch (error) {
