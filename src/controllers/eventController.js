@@ -189,6 +189,52 @@ async function getEventsByDateRange(startDate, endDate) {
     }
 }
 
+// addBrochure
+async function addBrochure(id, brochureLink) {
+    try{
+        // Find the event by ID and update it with the brochure link
+        const updatedEvent = await Event.findByIdAndUpdate(
+            id,
+            { brochure: brochureLink }, // Assuming the brochure field exists
+            { new: true } // Return the updated document
+        );
+
+        // If no event was found, return null
+        if (!updatedEvent) {
+            return null;
+        }
+
+        return updatedEvent;
+    }
+    catch (error) {
+        console.error('Error updating event brochure:', error);
+        throw new Error('Database update failed'); // Optionally handle this in your controller
+    }
+}
+
+//ActivityReport
+
+async function AddActivityReport(id, ActivityReportLink) {
+    try{
+        const updatedEvent = await Event.findByIdAndUpdate(
+            id,
+            { ActivityReport: ActivityReportLink }, 
+            { new: true } 
+        );
+
+        // If no event was found, return null
+        if (!updatedEvent) {
+            return null;
+        }
+
+        return updatedEvent;
+    }
+    catch (error) {
+        console.error('Error updating event ActivityReport:', error);
+        throw new Error('Database update failed'); 
+    }  
+}
+
 module.exports = {
     createEvent,
     getAllEvents,
@@ -202,5 +248,7 @@ module.exports = {
     getTypes,
     getPendingEvents,
     addImages,
-    getEventsByDateRange
+    getEventsByDateRange,
+    addBrochure,
+    AddActivityReport
 };

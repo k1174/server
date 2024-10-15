@@ -21,7 +21,9 @@ const eventSchema = new mongoose.Schema({
     // image: { type: mongoose.Schema.Types.ObjectId, ref: 'Img' } // Reference to the Img document
     // images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Img' }] // Array of references to Img documents
     images: [{ type: String }],
-    formData: { type: [mongoose.Schema.Types.Mixed], default: [] } // Array of mixed types
+    formData: { type: [mongoose.Schema.Types.Mixed], default: [] }, // Array of mixed types
+    brochure:[{type: String}],
+    ActivityReport:[{type:String}]
 });
 
 

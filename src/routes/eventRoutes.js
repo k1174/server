@@ -159,6 +159,69 @@ router.post('/events/addImages/:id', upload.array('images'), async (req, res) =>
     }
 })
 
+//router to add brochure pdf to the existing event
+router.post('/events/addBrochure/:id', upload.single('brochure'), async (req, res) => {
+    try{
+        const id = req.params.id
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'brochures'
+        })
+        
+        fs.unlink(req.file.path, (err) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+        })
+
+        // Update the event with the brochure URL
+        const updatedEvent = await eventController.addBrochure(id, result.secure_url);
+        if (!updatedEvent) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        console.log('Brochure added successfully');
+        res.json(updatedEvent);
+
+    }
+    catch (error) {
+        console.error('Error adding brochure:', error);
+        res.status(500).json({ err: 'Error adding brochure' });
+    }
+})
+
+// router to add Activity Report to the existing event
+router.post('/events/AddActivityReport/:id', upload.single('ActivityReport'), async (req, res) => {
+    try{
+        const id = req.params.id
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'ActivityReport'
+        })
+        
+        fs.unlink(req.file.path, (err) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+        })
+
+        // Update the event with the brochure URL
+        const updatedEvent = await eventController.AddActivityReport(id, result.secure_url);
+        if (!updatedEvent) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        console.log('Brochure added successfully');
+        res.json(updatedEvent);
+
+    }
+    catch (error) {
+        console.error('Error adding Activity Report:', error);
+        res.status(500).json({ err: 'Error adding Activity Report' });
+    }
+})
+
+
 router.put('/events/:id', async (req, res) => {
     try {
         const id = req.params.id;
