@@ -34,7 +34,6 @@ async function createEvent(eventData) {
 async function getAllEvents(status) {
     try {
         const now = new Date();
-        now.setHours(0, 0, 0, 0);
         const events = await Event.find({ status: status, date: { $gte: now } })
             .select('-images') // Exclude the images field
             .sort({ date: 'asc' });
