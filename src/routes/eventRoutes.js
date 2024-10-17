@@ -59,7 +59,7 @@ router.get('/events/past', async (req, res) => {
 
 //router to get events events between two dates
 // GET /events/range?startDate=2024-01-01&endDate=2024-12-31
-router.get('/events/range', async (req,res)=>{
+router.get('/events/range', async (req, res) => {
     const startDate = req.query.startDate;
     const endDate = req.query.endDate;
 
@@ -67,11 +67,11 @@ router.get('/events/range', async (req,res)=>{
         return res.status(400).json({ error: 'Please provide both startDate and endDate' });
     }
 
-    try{
+    try {
         const events = await eventController.getEventsByDateRange(startDate, endDate);
         res.json(events);
     }
-    catch(err){
+    catch (err) {
         console.error('Error fetching events:', error);
         res.status(500).json({ err: 'Error fetching events' });
     }
@@ -118,7 +118,7 @@ router.post('/events/addevent', upload.array('images'), async (req, res) => {
         // const eventData = req.body
         const savedEvent = await eventController.createEvent(eventData);
         console.log('Event saved successfully:', savedEvent);
-        res.status(200).send('Event saved successfully');
+        res.json(savedEvent);
     }
     catch (error) {
         console.error('Error saving event:', error);
@@ -161,12 +161,12 @@ router.post('/events/addImages/:id', upload.array('images'), async (req, res) =>
 
 //router to add brochure pdf to the existing event
 router.post('/events/addBrochure/:id', upload.single('brochure'), async (req, res) => {
-    try{
+    try {
         const id = req.params.id
         const result = await cloudinary.uploader.upload(req.file.path, {
             folder: 'brochures'
         })
-        
+
         fs.unlink(req.file.path, (err) => {
             if (err) {
                 console.error(err)
@@ -192,12 +192,12 @@ router.post('/events/addBrochure/:id', upload.single('brochure'), async (req, re
 
 // router to add Activity Report to the existing event
 router.post('/events/AddActivityReport/:id', upload.single('ActivityReport'), async (req, res) => {
-    try{
+    try {
         const id = req.params.id
         const result = await cloudinary.uploader.upload(req.file.path, {
             folder: 'ActivityReport'
         })
-        
+
         fs.unlink(req.file.path, (err) => {
             if (err) {
                 console.error(err)
