@@ -11,7 +11,6 @@ const eventSchema = new mongoose.Schema({
     type: { type: String, required: true },
     department: { type: String, required: true },
     date: { type: Date, required: true },
-    time: { type: String, required: true },
     price: { type: Number, required: true },
     organiserName: { type: String, required: true },
     organiserEmail: { type: String, required: true },
