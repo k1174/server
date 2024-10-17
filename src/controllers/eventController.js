@@ -150,7 +150,7 @@ async function getPastEvents() {
 //get event created by userId
 async function getUserCreatedEvents(userId) {
     try {
-        const events = await Event.find({ userId: userId });
+        const events = await Event.find({ userId: userId }).sort({ date: 'asc' });
         return events;
     }
     catch (error) {
