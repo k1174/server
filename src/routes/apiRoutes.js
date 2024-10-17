@@ -29,7 +29,7 @@ router.post('/registerEvent', async (req, res) => {
         if (existingRegistration) {
             return res.status(400).json({ message: 'User is already registered for this event' });
         }
-        
+
         const registration = new Registration({ userId, eventId, additionalDetails });
         const savedRegistration = await registration.save();
         res.status(201).json({ message: 'User registered for event', savedRegistration });
@@ -47,16 +47,6 @@ router.get('/getUsers', async (req, res) => {
     res.status(200).json(users);
 })
 
-// Helper function to parse time string
-const parseTime = (timeStr) => {
-    const [time, period] = timeStr.split(' ');
-    let [hours, minutes] = time.split(':').map(Number);
-
-    if (period === 'PM' && hours < 12) hours += 12;
-    if (period === 'AM' && hours === 12) hours = 0;
-
-    return { hours, minutes };
-};
 
 //router to get events of an user
 router.post('/getEvents', async (req, res) => {
@@ -75,16 +65,13 @@ router.post('/getEvents', async (req, res) => {
         }
 
 
-        // Get today's date and time
+        // Get today's date 
         const now = new Date();
-        // Filter out events based on date and time
+        // Filter out events based on date 
         const upcomingEvents = registrations
             .map(reg => reg.eventId)
             .filter(event => {
                 const eventDate = new Date(event.date);
-                const { hours, minutes } = parseTime(event.time);
-                eventDate.setHours(hours, minutes, 0, 0); // Set the event time
-
                 return eventDate >= now;
             });
 
@@ -131,13 +118,13 @@ router.get('/getUsersCount/:eventId', async (req, res) => {
     }
 })
 
-router.get('/getRegistrations/:eventId', async (req, res) =>{
-    const {eventId} = req.params;
-    try{
-        const registraions = await Registration.find({eventId}).select('additionalDetails');
+router.get('/getRegistrations/:eventId', async (req, res) => {
+    const { eventId } = req.params;
+    try {
+        const registraions = await Registration.find({ eventId }).select('additionalDetails');
         res.status(200).json(registraions)
     }
-    catch(err){
+    catch (err) {
         console.error('Error fetching registraions', err);
         res.status(500).json({ error: err.message });
     }
@@ -166,16 +153,16 @@ router.get('/getReport/:eventId', async (req, res) => {
         // if (!feedbacks.length) {
         //     return res.status(404).json({ message: 'No feedback found for this event' });
         // }
-        
+
         // const registrations = await Registration.find({ eventId }).populate('userId');
         // const users = registrations.map(reg => reg.userId.email);
-        
+
         // const avgRating = feedbacks.reduce((acc, curr) => acc + curr.rating, 0) / feedbacks.length;
         // const feedbackCount = feedbacks.length;
         const feedbackContent = feedbacks.map(feedback => {
             return `feedback: ${feedback.feedback}, rating: ${feedback.rating}`
         });
-        res.status(200).json( feedbackContent);
+        res.status(200).json(feedbackContent);
     }
     catch (err) {
         console.error('Error getting report:', err);
@@ -187,7 +174,7 @@ router.get('/getReport/:eventId', async (req, res) => {
 router.get('/getFeedbacks/:eventId', async (req, res) => {
     const { eventId } = req.params;
     try {
-        const feedbacks = await Feedback.find({ eventId });
+        const feedbacks = await Feedback.find({ eventId }).populate('userId');
         if (!feedbacks.length) {
             return res.status(404).json({ message: 'No feedback found for this event' });
         }
