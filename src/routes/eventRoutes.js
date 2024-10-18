@@ -4,6 +4,7 @@ const eventController = require('../controllers/eventController')
 const { matchSorter } = require('match-sorter')
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
+const Registration = require('../models/registrationModel');
 
 const multer = require('multer')
 const storage = multer.diskStorage({
@@ -69,10 +70,18 @@ router.get('/events/range', async (req, res) => {
 
     try {
         const events = await eventController.getEventsByDateRange(startDate, endDate);
-        res.json(events);
+
+        const eventsWithCount = await Promise.all(events.map(async (event) => {
+            const count = await Registration.countDocuments({ eventId: event._id });
+            return {
+                ...event.toObject(), // Convert Mongoose document to plain object 
+                registrationCount: count,
+            };
+        }));
+        res.json(eventsWithCount);
     }
     catch (err) {
-        console.error('Error fetching events:', error);
+        console.error('Error fetching events:', err);
         res.status(500).json({ err: 'Error fetching events' });
     }
 })
