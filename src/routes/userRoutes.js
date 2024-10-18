@@ -50,6 +50,43 @@ router.post('/login', async (req, res) => {
     }
 })
 
+//route for foregot password
+router.post('/forgotPassword', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await userController.getUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const token = await userController.generatePasswordReset(email);
+        await userController.sendPasswordResetEmail(email, token);
+        res.json({ message: 'Password reset link sent to email', token });
+    }
+    catch (err) {
+        console.error('Error generating password reset link:', err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+//route to reset password
+router.post('/resetPassword', async (req, res) => {
+    try {
+        const { token, password } = req.body;
+        const reset = await userController.getPasswordReset(token);
+        if (!reset) {
+            return res.status(404).json({ message: 'Invalid or expired token' });
+        }
+        const user = await userController.getUserByEmail(reset.email);
+        user.password = password;
+        await user.save();
+        res.json({ message: 'Password reset successfully' });
+    }
+    catch (err) {
+        console.error('Error resetting password:', err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
 // Route to get the profile of the logged-in user
 router.get('/profile', async (req, res) => {
     try {
