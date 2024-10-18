@@ -71,13 +71,13 @@ router.post('/forgotPassword', async (req, res) => {
 //route to reset password
 router.post('/resetPassword', async (req, res) => {
     try {
-        const { token, password } = req.body;
+        const { token, newpassword } = req.body;
         const reset = await userController.getPasswordReset(token);
         if (!reset) {
             return res.status(404).json({ message: 'Invalid or expired token' });
         }
         const user = await userController.getUserByEmail(reset.email);
-        user.password = password;
+        user.password = newpassword;
         await user.save();
         res.json({ message: 'Password reset successfully' });
     }
