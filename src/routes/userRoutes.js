@@ -13,18 +13,48 @@ router.post('/register', async (req, res) => {
         //find if email id already exists
         const user = await userController.getUserByEmail(userData.email);
         if (user) {
-            return res.status(400).json({ error: 'User with this email already exists' });
+            if (user.confirmation) {
+                return res.status(400).json({ error: 'User with this email already exists' });
+            } else {
+                // Resend confirmation email if the account is unconfirmed
+                const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                await userController.sendConfirmationEmail(user.email, token);
+                return res.status(400).json({ error: 'Account exists but is unconfirmed. A new confirmation email has been sent.' });
+            }
         }
 
         const savedUser = await userController.createUser(userData);
+        const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        //send email to user to confirm email
+        await userController.sendConfirmationEmail(savedUser.email, token);
+
         console.log('User saved successfully:', savedUser);
         res.status(201).json({
-            message: 'User registered successfully',
+            message: 'Check Your Mail to Confirm Your Account',
             savedUser
         });
     }
     catch (err) {
         console.error('Error saving user:', err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+//Route to confirm account
+router.post('/confirmaccount', async (req, res) => {
+    try {
+        const { token } = req.body;        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await userController.getUserById(decoded.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        user.confirmation = true;
+        await user.save();
+        res.json({ message: 'Account confirmed successfully' });
+    }
+    catch (err) {
+        console.error('Error confirming Account:', err);
         res.status(500).json({ error: err.message });
     }
 })

@@ -135,6 +135,26 @@ async function sendPasswordResetEmail(email, token) {
     
 }
 
+//send email to user to confirm email
+async function sendConfirmationEmail(email, token) {
+    try {
+        const link = `${process.env.FRONTEND_URL}/confirmaccount/${token}`;
+        const mailOptions = {
+            from: process.env.EMAIL_FROM,
+            to: email,
+            subject: 'Account Confirmation',
+            text: `Click on the link to confirm your account: ${link}`,
+            html: `<p>Click <a href="${link}">here</a> to confirm your account</p>`
+        };
+        await transporter.sendMail(mailOptions);
+    }
+    catch (error) {
+        console.error('Error sending confirmation email:', error);
+        throw error;
+    }
+    
+}
+
 module.exports = {
     createUser,
     getUserByEmail,
@@ -143,5 +163,6 @@ module.exports = {
     checkEvent,
     generatePasswordReset,
     sendPasswordResetEmail,
-    getPasswordReset
+    getPasswordReset,
+    sendConfirmationEmail
 }
