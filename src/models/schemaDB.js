@@ -7,10 +7,11 @@ const eventSchema = new mongoose.Schema({
     name: { type: String, required: true },
     location: { type: String, required: true },
     description: { type: String, required: true },
-    details:{type: String},
+    details: { type: String },
     type: { type: String, required: true },
     department: { type: String, required: true },
     date: { type: Date, required: true },
+    dateEnd: { type: Date },
     price: { type: Number, required: true },
     organiserName: { type: String, required: true },
     organiserEmail: { type: String, required: true },
@@ -21,8 +22,10 @@ const eventSchema = new mongoose.Schema({
     // images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Img' }] // Array of references to Img documents
     images: [{ type: String }],
     formData: { type: [mongoose.Schema.Types.Mixed], default: [] }, // Array of mixed types
-    brochure:[{type: String}],
-    ActivityReport:[{type:String}]
+    brochure: [{ type: String }],
+    ActivityReport: [{ type: String }],
+    registrationStart: { type: Date },
+    registrationEnd: { type: Date }
 });
 
 
